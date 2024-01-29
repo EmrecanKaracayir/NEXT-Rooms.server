@@ -1,0 +1,20 @@
+{
+  "dictionaries": [],
+  "dictionaryDefinitions": [],
+  "ignorePaths": [],
+  "ignoreWords": [],
+  "import": [],
+  "version": "0.2",
+  "words": [
+    "codepaths",
+    "dbname",
+    "ecma",
+    "Emrecan",
+    "JFVA",
+    "Karacayir",
+    "postgres",
+    "psql",
+    "tsbuildinfo",
+    "typedef"
+  ]
+}

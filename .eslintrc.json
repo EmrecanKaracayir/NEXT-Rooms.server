@@ -1,0 +1,30 @@
+{
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "root": true,
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/typedef": [
+      "error",
+      {
+        "arrayDestructuring": true,
+        "arrowParameter": true,
+        "memberVariableDeclaration": true,
+        "objectDestructuring": true,
+        "parameter": true,
+        "propertyDeclaration": true,
+        "variableDeclaration": true,
+        "variableDeclarationIgnoreFunction": true
+      }
+    ]
+  }
+}
