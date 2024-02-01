@@ -1,6 +1,7 @@
-import { HttpStatusCodeMap } from "../../@types";
+import { HttpStatusCodeMap } from "../../@types/maps";
+import { IResponse } from "../interfaces/IResponse";
 
-export class HttpStatus {
+export class HttpStatus implements IResponse {
   public readonly code: number;
   public readonly message: string;
 
@@ -26,7 +27,7 @@ export enum HttpStatusCode {
   INTERNAL_SERVER_ERROR = 500,
 }
 
-export const httpStatusMessages: HttpStatusCodeMap = {
+export const httpStatusMessages: HttpStatusCodeMap<string> = {
   [HttpStatusCode.OK]: "OK",
   [HttpStatusCode.CREATED]: "Created",
   [HttpStatusCode.NO_CONTENT]: "No Content",

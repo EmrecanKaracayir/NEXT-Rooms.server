@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
+import { IHelper } from "../interfaces/IHelper";
 
-export class EncryptionHelper {
+export class EncryptionHelper implements IHelper {
   public static async encrypt(data: string): Promise<Promise<string>> {
     const salt: string = await bcrypt.genSalt();
     return await bcrypt.hash(data, salt);

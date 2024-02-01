@@ -1,7 +1,13 @@
-import { AppNextFunction, AppRequest, AppResponse } from "../../@types";
+import { MiddlewareResponse } from "../../@types/responses";
+import { ExpressNextFunction, ExpressRequest } from "../../@types/wrappers";
+import { IMiddleware } from "../interfaces/IMiddleware";
 
-export class LoggerMiddleware {
-  public static log(req: AppRequest, _res: AppResponse<null, null>, next: AppNextFunction): void {
+export class LoggerMiddleware implements IMiddleware {
+  public static log(
+    req: ExpressRequest,
+    _res: MiddlewareResponse<null, null>,
+    next: ExpressNextFunction,
+  ): void {
     console.log(`Received a ${req.method} request on ${req.url} at ${new Date().toISOString()}`);
     return next();
   }

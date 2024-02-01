@@ -1,15 +1,17 @@
-import { AppNextFunction, AppRequest, AppResponse } from "../../@types";
+import { MiddlewareResponse } from "../../@types/responses";
+import { ExpressNextFunction, ExpressRequest } from "../../@types/wrappers";
+import { IMiddleware } from "../interfaces/IMiddleware";
 import { HttpStatus, HttpStatusCode } from "../schemas/HttpStatus";
 import { ServerError } from "../schemas/ServerError";
 
-export class FailureMiddleware {
+export class FailureMiddleware implements IMiddleware {
   public static serverFailure(
     error: Error,
-    _req: AppRequest,
-    res: AppResponse<null, null>,
+    _req: ExpressRequest,
+    res: MiddlewareResponse<null, null>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _next: AppNextFunction,
-  ): AppResponse<null, null> | void {
+    _next: ExpressNextFunction,
+  ): MiddlewareResponse<null, null> | void {
     // Response declaration
     const httpStatus: HttpStatus = new HttpStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
     // Logic

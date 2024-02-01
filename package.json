@@ -2,7 +2,7 @@
   "name": "next-rooms.server",
   "version": "0.0.1",
   "description": "NEXT-Rooms.server",
-  "main": "dist/server.js",
+  "main": "dist/main.js",
   "author": "EmrecanKaracayir",
   "license": "PROPRIETARY",
   "scripts": {
@@ -14,7 +14,7 @@
     "dev": "tsc --watch",
     "dbOut": "pg_dump --host=localhost --port=5432 --username=postgres --no-password --dbname=next --format=plain --blobs --file=./dumps/db.sql",
     "dbIn": "psql --host=localhost --port=5432 --username=postgres --no-password --dbname=postgres --command=\"DROP DATABASE IF EXISTS next;\" && psql --host=localhost --port=5432 --username=postgres --no-password --dbname=postgres --command=\"CREATE DATABASE next;\" && psql --host=localhost --port=5432 --username=postgres --no-password --dbname=next --file=./dumps/db.sql",
-    "startDev": "node ./dist/server.js",
+    "startDev": "node ./dist/main.js",
     "startLive": "pm2 start  ./dist/server.js",
     "stopLive": "pm2 stop ./dist/server.js"
   },
