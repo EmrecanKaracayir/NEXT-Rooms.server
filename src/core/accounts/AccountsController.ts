@@ -64,7 +64,9 @@ export class AccountsController implements IController {
       // HAND OVER TO MANAGER
       const managerResponse: ManagerResponse<AccountsResponse | null> =
         await this.mManager.getAccount(validatedData);
+      // Check response
       if (!managerResponse.httpStatus.isSuccess() || !managerResponse.data) {
+        // Unsuccessful response
         return ResponseUtil.controllerResponse(
           res,
           managerResponse.httpStatus,
@@ -74,7 +76,7 @@ export class AccountsController implements IController {
           null,
         );
       }
-      // Response
+      // Successful response
       return ResponseUtil.controllerResponse(
         res,
         managerResponse.httpStatus,

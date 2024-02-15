@@ -6,7 +6,8 @@ export class EnvironmentHelper implements IHelper {
   private static sInstance: EnvironmentHelper;
 
   // Variable names
-  private static readonly JWT_SECRET_KEY: string = "SldUX1NFQ1JFVA";
+  private static readonly JWT_SECRET_KEY: string = "LUFHJFJnXjk2KUk3";
+  private static readonly POOL_PASSWORD_KEY: string = "bDkxWGohQiN1RD0h";
 
   public static load(): EnvironmentHelper {
     if (!EnvironmentHelper.sInstance) {
@@ -21,13 +22,18 @@ export class EnvironmentHelper implements IHelper {
   }
 
   private readonly mJwtSecret: Secret;
-
   public get jwtSecret(): Secret {
     return this.mJwtSecret;
   }
 
+  private readonly mPoolPassword: string;
+  public get poolPassword(): string {
+    return this.mPoolPassword;
+  }
+
   private constructor() {
     this.mJwtSecret = this.loadJwtSecret();
+    this.mPoolPassword = this.loadPoolPassword();
   }
 
   private loadJwtSecret(): Secret {
@@ -35,6 +41,17 @@ export class EnvironmentHelper implements IHelper {
     if (!encodedJwtSecret) {
       throw new Error(`Environment variable "${EnvironmentHelper.JWT_SECRET_KEY}" is not defined!`);
     }
-    return Buffer.from(encodedJwtSecret, "base64").toString("ascii");
+    return Buffer.from(encodedJwtSecret, "base64url").toString("utf8");
+  }
+
+  private loadPoolPassword(): string {
+    const encodedPoolPassword: string | undefined =
+      process.env[EnvironmentHelper.POOL_PASSWORD_KEY];
+    if (!encodedPoolPassword) {
+      throw new Error(
+        `Environment variable "${EnvironmentHelper.POOL_PASSWORD_KEY}" is not defined!`,
+      );
+    }
+    return Buffer.from(encodedPoolPassword, "base64url").toString("utf8");
   }
 }

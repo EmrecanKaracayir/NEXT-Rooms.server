@@ -5,6 +5,7 @@ import type {
   ProviderResponse,
 } from "../../@types/responses";
 import type { Tokens } from "../../@types/tokens";
+import { DbConstants } from "../constants/DbConstants";
 import type { IModel } from "../interfaces/IModel";
 import type { IResponse } from "../interfaces/IResponse";
 import type { IUtil } from "../interfaces/IUtil";
@@ -58,7 +59,10 @@ export class ResponseUtil implements IUtil {
     };
   }
 
-  public static providerResponse<D extends IModel | null>(data: D): ProviderResponse<D> {
+  public static async providerResponse<D extends IModel | null>(
+    data: D,
+  ): Promise<ProviderResponse<D>> {
+    await DbConstants.POOL.query(DbConstants.COMMIT);
     return {
       data,
     };

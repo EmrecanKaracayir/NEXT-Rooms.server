@@ -1,12 +1,13 @@
 import { Pool } from "pg";
+import { EnvironmentHelper } from "../helpers/EnvironmentHelper";
 import { IConstants } from "../interfaces/IConstants";
 
 export class DbConstants implements IConstants {
   public static readonly POOL: Pool = new Pool({
-    user: "postgres",
+    user: `"UNext"`,
     host: "localhost",
-    database: "next",
-    password: "password",
+    database: `"DNext"`,
+    password: EnvironmentHelper.get().poolPassword,
     port: 5432,
   });
   public static readonly BEGIN: string = "BEGIN";

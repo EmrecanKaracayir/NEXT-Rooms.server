@@ -15,11 +15,9 @@ export class AccountHandler {
       if (!accountRec) {
         return false;
       }
-      if (!AccountModel.isValidModel(accountRec)) {
-        throw new ModelMismatchError(accountRec);
-      }
+      const model: AccountModel = AccountModel.fromRecord(accountRec);
       await DbConstants.POOL.query(DbConstants.COMMIT);
-      return true;
+      return ;
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;

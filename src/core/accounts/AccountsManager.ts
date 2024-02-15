@@ -18,12 +18,13 @@ export class AccountsManager implements IManager {
   public async getAccount(
     validatedData: AccountsRequest,
   ): Promise<ManagerResponse<AccountsResponse | null>> {
-    // Try to get account
+    // Try to get the account
     const providerResponse: ProviderResponse<AccountModel | null> = await this.mProvider.getAccount(
       validatedData.username,
     );
-    // Check if there were any errors
+    // Check response
     if (!providerResponse.data) {
+      // Return with error(s)
       return ResponseUtil.managerResponse(
         new HttpStatus(HttpStatusCode.NOT_FOUND),
         null,

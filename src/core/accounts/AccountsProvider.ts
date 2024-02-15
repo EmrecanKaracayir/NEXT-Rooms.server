@@ -9,19 +9,15 @@ export class AccountsProvider implements IProvider {
   public async getAccount(username: string): Promise<ProviderResponse<AccountModel | null>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
-      const accountRes: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$UNAME, [
+      const results: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$UNAME, [
         username,
       ]);
-      const accountRec: unknown = accountRes.rows[0];
-      if (!accountRec) {
-        await DbConstants.POOL.query(DbConstants.COMMIT);
-        return {
-          data: null,
-        };
+      const record: unknown = results.rows[0];
+      if (!record) {
+        return await ResponseUtil.providerResponse(null);
       }
-      const model: AccountModel = AccountModel.fromRecord(accountRec);
-      await DbConstants.POOL.query(DbConstants.COMMIT);
-      return ResponseUtil.providerResponse(model);
+      const model: AccountModel = AccountModel.fromRecord(record);
+      return await ResponseUtil.providerResponse(model);
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;
