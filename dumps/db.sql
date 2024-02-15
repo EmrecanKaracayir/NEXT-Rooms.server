@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.1
--- Dumped by pg_dump version 16.1
+-- Dumped from database version 16.2
+-- Dumped by pg_dump version 16.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -76,8 +76,8 @@ ALTER SEQUENCE public."Account_accountId_seq" OWNED BY public."Account"."account
 CREATE TABLE public."Session" (
     "sessionId" integer NOT NULL,
     "accountId" integer NOT NULL,
-    sessionkey character varying(128) NOT NULL,
-    refreshtoken character varying(1024) NOT NULL,
+    "sessionKey" character varying(128) NOT NULL,
+    "refreshToken" character varying(256) DEFAULT 'dummy_refresh_token'::character varying NOT NULL,
     "lastActivityDate" date DEFAULT CURRENT_DATE NOT NULL
 );
 
@@ -125,6 +125,7 @@ ALTER TABLE ONLY public."Session" ALTER COLUMN "sessionId" SET DEFAULT nextval('
 --
 
 COPY public."Account" ("accountId", username, password, membership) FROM stdin;
+11	Alper	$2b$10$BBtrF3xmlo8pzC.Jbn8Sb.bGkv3xjuN1utcrVXXknAh76j7Xq4pPu	FREE
 \.
 
 
@@ -132,7 +133,8 @@ COPY public."Account" ("accountId", username, password, membership) FROM stdin;
 -- Data for Name: Session; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."Session" ("sessionId", "accountId", sessionkey, refreshtoken, "lastActivityDate") FROM stdin;
+COPY public."Session" ("sessionId", "accountId", "sessionKey", "refreshToken", "lastActivityDate") FROM stdin;
+17	11	OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5.Tk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk____1	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50SWQiOjExLCJtZW1iZXJzaGlwIjoiRlJFRSIsInNlc3Npb25JZCI6MTcsImlhdCI6MTcwNjg4MDk5MSwiZXhwIjoxNzA5NDcyOTkxfQ.Ve7t6nWueQFhT648zvB2auESRhJP0dywzxpqvPkCqOU	2024-02-02
 \.
 
 
@@ -140,14 +142,14 @@ COPY public."Session" ("sessionId", "accountId", sessionkey, refreshtoken, "last
 -- Name: Account_accountId_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Account_accountId_seq"', 1, false);
+SELECT pg_catalog.setval('public."Account_accountId_seq"', 11, true);
 
 
 --
 -- Name: Session_sessionId_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Session_sessionId_seq"', 1, false);
+SELECT pg_catalog.setval('public."Session_sessionId_seq"', 17, true);
 
 
 --
