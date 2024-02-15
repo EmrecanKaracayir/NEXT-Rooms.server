@@ -4,7 +4,7 @@ import { ExpressNextFunction, ExpressRequest } from "../../@types/wrappers";
 import { IController } from "../../app/interfaces/IController";
 import { ClientError, ClientErrorCode } from "../../app/schemas/ClientError";
 import { HttpStatus, HttpStatusCode } from "../../app/schemas/HttpStatus";
-import { AuthModule } from "../../modules/auth/main";
+import { AuthModule } from "../../modules/auth/module";
 import { SignupManager } from "./SignupManager";
 import { SignupRequest } from "./schemas/SignupRequest";
 import { SignupResponse } from "./schemas/SignupResponse";
@@ -26,7 +26,7 @@ export class SignupController implements IController {
     // Logic
     try {
       // Validate request body
-      if (!SignupRequest.isValidReq(req.body)) {
+      if (!SignupRequest.isValidRequest(req.body)) {
         const httpStatus: HttpStatus = new HttpStatus(HttpStatusCode.BAD_REQUEST);
         clientErrors.push(new ClientError(ClientErrorCode.INVALID_REQUEST_BODY));
         return res.status(httpStatus.code).send({
@@ -57,7 +57,7 @@ export class SignupController implements IController {
         serverError: managerResponse.serverError,
         clientErrors: managerResponse.clientErrors,
         data: managerResponse.data,
-        tokens: await AuthModule.get()
+        tokens: await AuthModule.instance
           .withData({
             accountId: managerResponse.data.accountId,
             membership: managerResponse.data.membership,

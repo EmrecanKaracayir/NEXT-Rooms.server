@@ -1,19 +1,19 @@
-import { Membership } from "../../../app/enums/Membership";
+import type { Membership } from "../../../app/enums/Membership";
 import { IResponse } from "../../../app/interfaces/IResponse";
-import { LoginModel } from "../models/LoginModel";
+import type { AccountModel } from "../../../app/models/AccountModel";
 
 export class LoginResponse implements IResponse {
   constructor(
-    readonly accountId: number,
-    readonly username: string,
-    readonly membership: Membership,
+    public readonly accountId: number,
+    public readonly username: string,
+    public readonly membership: Membership,
   ) {}
 
-  public static fromModel(model: LoginModel): LoginResponse {
+  public static fromModel(model: AccountModel): LoginResponse {
     return new LoginResponse(model.accountId, model.username, model.membership);
   }
 
-  public static fromModels(models: LoginModel[]): LoginResponse[] {
-    return models.map((model: LoginModel): LoginResponse => LoginResponse.fromModel(model));
+  public static fromModels(models: AccountModel[]): LoginResponse[] {
+    return models.map((model: AccountModel): LoginResponse => LoginResponse.fromModel(model));
   }
 }

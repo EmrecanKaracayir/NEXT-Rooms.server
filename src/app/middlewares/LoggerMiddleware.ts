@@ -5,7 +5,7 @@ import { IMiddleware } from "../interfaces/IMiddleware";
 export class LoggerMiddleware implements IMiddleware {
   public static log(
     req: ExpressRequest,
-    _res: MiddlewareResponse<null, null>,
+    _res: MiddlewareResponse,
     next: ExpressNextFunction,
   ): void {
     console.log(`Received a ${req.method} request on ${req.url} at ${new Date().toISOString()}`);

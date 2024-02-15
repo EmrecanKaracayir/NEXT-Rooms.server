@@ -6,7 +6,7 @@ import { TokenVerifier } from "./core/TokenVerifier";
 export class AuthModule implements IModule {
   private static sInstance: AuthModule;
 
-  public static get(): AuthModule {
+  public static get instance(): AuthModule {
     if (!AuthModule.sInstance) {
       AuthModule.sInstance = new AuthModule();
     }

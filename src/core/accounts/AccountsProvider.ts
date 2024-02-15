@@ -2,12 +2,11 @@ import { QueryResult } from "pg";
 import { ProviderResponse } from "../../@types/responses";
 import { DbConstants } from "../../app/constants/DbConstants";
 import { IProvider } from "../../app/interfaces/IProvider";
-import { ModelMismatchError } from "../../app/schemas/ServerError";
-import { LoginModel } from "./models/LoginModel";
-import { LoginModelValidator } from "./validators/LoginModelValidator";
+import { AccountModel } from "../../app/models/AccountModel";
+import { ResponseUtil } from "../../app/utils/ResponseUtil";
 
-export class LoginProvider implements IProvider {
-  public async getAccount(username: string): Promise<ProviderResponse<LoginModel | null>> {
+export class AccountsProvider implements IProvider {
+  public async getAccount(username: string): Promise<ProviderResponse<AccountModel | null>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
       const accountRes: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$UNAME, [
@@ -20,13 +19,9 @@ export class LoginProvider implements IProvider {
           data: null,
         };
       }
-      if (!LoginModelValidator.instance.isValidModel(accountRec)) {
-        throw new ModelMismatchError(accountRec);
-      }
+      const model: AccountModel = AccountModel.fromRecord(accountRec);
       await DbConstants.POOL.query(DbConstants.COMMIT);
-      return {
-        data: accountRec as LoginModel,
-      };
+      return ResponseUtil.providerResponse(model);
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;

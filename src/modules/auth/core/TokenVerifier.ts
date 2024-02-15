@@ -13,7 +13,7 @@ export class TokenVerifier {
   }
 
   public async verify(isRefreshToken: boolean = false): Promise<boolean> {
-    const JWT_SECRET: Secret = EnvironmentHelper.get().jwtSecret;
+    const JWT_SECRET: Secret = EnvironmentHelper.instance().jwtSecret;
     const payload: JwtPayload | string = jwt.verify(this.mToken, JWT_SECRET);
     if (!PayloadHelper.isValidPayload(payload)) {
       return false;
@@ -28,7 +28,7 @@ export class TokenVerifier {
   }
 
   public getPayload(): TokenPayload {
-    const JWT_SECRET: Secret = EnvironmentHelper.get().jwtSecret;
+    const JWT_SECRET: Secret = EnvironmentHelper.instance().jwtSecret;
     // Since we already verified the token in the middleware, we can safely cast to TokenPayload
     return jwt.verify(this.mToken, JWT_SECRET) as TokenPayload;
   }

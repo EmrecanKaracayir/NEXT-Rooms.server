@@ -1,24 +1,28 @@
 import { Router } from "express";
+import { Method } from "../../app/enums/Method";
+import { RouteHelper } from "../../app/helpers/RouteHelper";
 import { IBuilder } from "../../app/interfaces/IBuilder";
 import { LoginController } from "./LoginController";
 
 export class LoginBuilder implements IBuilder {
-  public static readonly sPath: string = "login";
+  public static readonly BASE_ROUTE: string = "login";
 
-  private readonly mRouter: Router;
+  public readonly router: Router;
+
   private readonly mController: LoginController;
 
   constructor() {
-    this.mRouter = Router();
+    this.router = Router();
     this.mController = new LoginController();
     this.buildRoutes();
   }
 
-  public get router(): Router {
-    return this.mRouter;
-  }
-
   private buildRoutes(): void {
-    this.mRouter.post("/", this.mController.postLogin.bind(this.mController));
+    RouteHelper.buildRoute(
+      this.router,
+      { baseRoute: LoginBuilder.BASE_ROUTE, route: "/" },
+      Method.POST,
+      this.mController.postLogin.bind(this.mController),
+    );
   }
 }

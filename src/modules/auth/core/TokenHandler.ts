@@ -5,7 +5,7 @@ import { AuthConstants } from "../app/constants/AuthConstants";
 
 export class TokenHandler {
   public static generateTokens(payload: TokenPayload): Tokens {
-    const JWT_SECRET: Secret = EnvironmentHelper.get().jwtSecret;
+    const JWT_SECRET: Secret = EnvironmentHelper.instance().jwtSecret;
     const accessToken: Token = jwt.sign(payload, JWT_SECRET, {
       expiresIn: AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME,
     });

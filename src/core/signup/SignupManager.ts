@@ -5,7 +5,7 @@ import { AccountRules } from "../../app/rules/AccountRules";
 import { SessionRules } from "../../app/rules/SessionRules";
 import { ClientError, ClientErrorCode } from "../../app/schemas/ClientError";
 import { HttpStatus, HttpStatusCode } from "../../app/schemas/HttpStatus";
-import { StringUtils } from "../../app/utils/StringUtils";
+import { StringUtil } from "../../app/utils/StringUtil";
 import { SignupProvider } from "./SignupProvider";
 import { SignupModel } from "./models/SignupModel";
 import { SignupRequest } from "./schemas/SignupRequest";
@@ -64,17 +64,20 @@ export class SignupManager implements IManager {
   ): void {
     // SessionKey validation
     if (
-      !StringUtils.isInLengthRange(
+      !StringUtil.isInLengthRange(
         sessionKey,
         SessionRules.SESSION_KEY_MIN_LENGTH,
         SessionRules.SESSION_KEY_MAX_LENGTH,
       )
     ) {
-      clientErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY));
+      clientErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY_LENGTH));
+    }
+    if (!StringUtil.matchesRegex(sessionKey, SessionRules.SESSION_KEY_REGEX)) {
+      clientErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY_CONTENT));
     }
     // Username validation
     if (
-      !StringUtils.isInLengthRange(
+      !StringUtil.isInLengthRange(
         username,
         AccountRules.USERNAME_MIN_LENGTH,
         AccountRules.USERNAME_MAX_LENGTH,
@@ -82,12 +85,12 @@ export class SignupManager implements IManager {
     ) {
       clientErrors.push(new ClientError(ClientErrorCode.SIGNUP_INVALID_USERNAME_LENGTH));
     }
-    if (!StringUtils.matchesRegex(username, AccountRules.USERNAME_REGEX)) {
+    if (!StringUtil.matchesRegex(username, AccountRules.USERNAME_REGEX)) {
       clientErrors.push(new ClientError(ClientErrorCode.SIGNUP_INVALID_USERNAME_CONTENT));
     }
     // Password validation
     if (
-      !StringUtils.isInLengthRange(
+      !StringUtil.isInLengthRange(
         password,
         AccountRules.PASSWORD_MIN_LENGTH,
         AccountRules.PASSWORD_MAX_LENGTH,
@@ -95,7 +98,7 @@ export class SignupManager implements IManager {
     ) {
       clientErrors.push(new ClientError(ClientErrorCode.SIGNUP_INVALID_PASSWORD_LENGTH));
     }
-    if (!StringUtils.matchesRegex(password, AccountRules.PASSWORD_REGEX)) {
+    if (!StringUtil.matchesRegex(password, AccountRules.PASSWORD_REGEX)) {
       clientErrors.push(new ClientError(ClientErrorCode.SIGNUP_INVALID_PASSWORD_CONTENT));
     }
   }

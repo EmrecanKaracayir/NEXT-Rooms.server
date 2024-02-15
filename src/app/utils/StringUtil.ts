@@ -1,6 +1,6 @@
 import { IUtil } from "../interfaces/IUtil";
 
-export class StringUtils implements IUtil {
+export class StringUtil implements IUtil {
   public static isInLengthRange(str: string, minLength: number, maxLength: number): boolean {
     return str.length >= minLength && str.length <= maxLength;
   }

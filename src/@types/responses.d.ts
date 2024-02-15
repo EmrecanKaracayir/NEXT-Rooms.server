@@ -17,10 +17,7 @@ export type ControllerResponse<
   tokens: T;
 }>;
 
-export type MiddlewareResponse<
-  D extends IResponse | null,
-  T extends Tokens | null,
-> = ControllerResponse<D, T>;
+export type MiddlewareResponse = ControllerResponse<null, null>;
 
 export type ManagerResponse<D extends IResponse | null> = {
   httpStatus: HttpStatus;
