@@ -12,8 +12,8 @@
     "prebuild": "npm run clean && npm run format && npm run lint",
     "build": "tsc",
     "dev": "tsc --watch",
-    "dbOut": "pg_dump --host=localhost --port=5432 --username=postgres --no-password --dbname=next --format=plain --blobs --file=./dumps/db.sql",
-    "dbIn": "psql --host=localhost --port=5432 --username=postgres --no-password --dbname=postgres --command=\"DROP DATABASE IF EXISTS next;\" && psql --host=localhost --port=5432 --username=postgres --no-password --dbname=postgres --command=\"CREATE DATABASE next;\" && psql --host=localhost --port=5432 --username=postgres --no-password --dbname=next --file=./dumps/db.sql",
+    "dbOut": "pg_dump --host=localhost --port=5432 --username=\"UNext\" --no-password --dbname=\"DNext\" --create --large-objects --file=./dumps/db.sql",
+    "dbIn": "psql --host=localhost --port=5432 --username=\"UNext\" --no-password --dbname=postgres --command=\"DROP DATABASE IF EXISTS \\\"DNext\\\";\" && psql --host=localhost --port=5432 --username=\"UNext\" --no-password --dbname=postgres --file=./dumps/db.sql",
     "startDev": "node ./dist/main.js",
     "startLive": "pm2 start  ./dist/server.js",
     "stopLive": "pm2 stop ./dist/server.js"

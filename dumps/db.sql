@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.2
--- Dumped by pg_dump version 16.2
+-- Dumped from database version 16.2 (Postgres.app)
+-- Dumped by pg_dump version 16.2 (Postgres.app)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,7 +17,29 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: MembershipType; Type: TYPE; Schema: public; Owner: postgres
+-- Name: DNext; Type: DATABASE; Schema: -; Owner: UNext
+--
+
+CREATE DATABASE "DNext" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
+
+
+ALTER DATABASE "DNext" OWNER TO "UNext";
+
+\connect "DNext"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: MembershipType; Type: TYPE; Schema: public; Owner: UNext
 --
 
 CREATE TYPE public."MembershipType" AS ENUM (
@@ -27,14 +49,14 @@ CREATE TYPE public."MembershipType" AS ENUM (
 );
 
 
-ALTER TYPE public."MembershipType" OWNER TO postgres;
+ALTER TYPE public."MembershipType" OWNER TO "UNext";
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: Account; Type: TABLE; Schema: public; Owner: postgres
+-- Name: Account; Type: TABLE; Schema: public; Owner: UNext
 --
 
 CREATE TABLE public."Account" (
@@ -45,10 +67,10 @@ CREATE TABLE public."Account" (
 );
 
 
-ALTER TABLE public."Account" OWNER TO postgres;
+ALTER TABLE public."Account" OWNER TO "UNext";
 
 --
--- Name: Account_accountId_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: Account_accountId_seq; Type: SEQUENCE; Schema: public; Owner: UNext
 --
 
 CREATE SEQUENCE public."Account_accountId_seq"
@@ -60,17 +82,17 @@ CREATE SEQUENCE public."Account_accountId_seq"
     CACHE 1;
 
 
-ALTER SEQUENCE public."Account_accountId_seq" OWNER TO postgres;
+ALTER SEQUENCE public."Account_accountId_seq" OWNER TO "UNext";
 
 --
--- Name: Account_accountId_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: Account_accountId_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: UNext
 --
 
 ALTER SEQUENCE public."Account_accountId_seq" OWNED BY public."Account"."accountId";
 
 
 --
--- Name: Session; Type: TABLE; Schema: public; Owner: postgres
+-- Name: Session; Type: TABLE; Schema: public; Owner: UNext
 --
 
 CREATE TABLE public."Session" (
@@ -82,10 +104,10 @@ CREATE TABLE public."Session" (
 );
 
 
-ALTER TABLE public."Session" OWNER TO postgres;
+ALTER TABLE public."Session" OWNER TO "UNext";
 
 --
--- Name: Session_sessionId_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: Session_sessionId_seq; Type: SEQUENCE; Schema: public; Owner: UNext
 --
 
 CREATE SEQUENCE public."Session_sessionId_seq"
@@ -97,31 +119,31 @@ CREATE SEQUENCE public."Session_sessionId_seq"
     CACHE 1;
 
 
-ALTER SEQUENCE public."Session_sessionId_seq" OWNER TO postgres;
+ALTER SEQUENCE public."Session_sessionId_seq" OWNER TO "UNext";
 
 --
--- Name: Session_sessionId_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: Session_sessionId_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: UNext
 --
 
 ALTER SEQUENCE public."Session_sessionId_seq" OWNED BY public."Session"."sessionId";
 
 
 --
--- Name: Account accountId; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: Account accountId; Type: DEFAULT; Schema: public; Owner: UNext
 --
 
 ALTER TABLE ONLY public."Account" ALTER COLUMN "accountId" SET DEFAULT nextval('public."Account_accountId_seq"'::regclass);
 
 
 --
--- Name: Session sessionId; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: Session sessionId; Type: DEFAULT; Schema: public; Owner: UNext
 --
 
 ALTER TABLE ONLY public."Session" ALTER COLUMN "sessionId" SET DEFAULT nextval('public."Session_sessionId_seq"'::regclass);
 
 
 --
--- Data for Name: Account; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: Account; Type: TABLE DATA; Schema: public; Owner: UNext
 --
 
 COPY public."Account" ("accountId", username, password, membership) FROM stdin;
@@ -130,7 +152,7 @@ COPY public."Account" ("accountId", username, password, membership) FROM stdin;
 
 
 --
--- Data for Name: Session; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: Session; Type: TABLE DATA; Schema: public; Owner: UNext
 --
 
 COPY public."Session" ("sessionId", "accountId", "sessionKey", "refreshToken", "lastActivityDate") FROM stdin;
@@ -139,21 +161,21 @@ COPY public."Session" ("sessionId", "accountId", "sessionKey", "refreshToken", "
 
 
 --
--- Name: Account_accountId_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: Account_accountId_seq; Type: SEQUENCE SET; Schema: public; Owner: UNext
 --
 
 SELECT pg_catalog.setval('public."Account_accountId_seq"', 11, true);
 
 
 --
--- Name: Session_sessionId_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: Session_sessionId_seq; Type: SEQUENCE SET; Schema: public; Owner: UNext
 --
 
 SELECT pg_catalog.setval('public."Session_sessionId_seq"', 17, true);
 
 
 --
--- Name: Account Account_name_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: Account Account_name_uk; Type: CONSTRAINT; Schema: public; Owner: UNext
 --
 
 ALTER TABLE ONLY public."Account"
@@ -161,7 +183,7 @@ ALTER TABLE ONLY public."Account"
 
 
 --
--- Name: Account Account_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: Account Account_pk; Type: CONSTRAINT; Schema: public; Owner: UNext
 --
 
 ALTER TABLE ONLY public."Account"
@@ -169,7 +191,7 @@ ALTER TABLE ONLY public."Account"
 
 
 --
--- Name: Session Session_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: Session Session_pk; Type: CONSTRAINT; Schema: public; Owner: UNext
 --
 
 ALTER TABLE ONLY public."Session"
@@ -177,7 +199,7 @@ ALTER TABLE ONLY public."Session"
 
 
 --
--- Name: Session Session_Account_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: Session Session_Account_fk; Type: FK CONSTRAINT; Schema: public; Owner: UNext
 --
 
 ALTER TABLE ONLY public."Session"
