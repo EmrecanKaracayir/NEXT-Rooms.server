@@ -26,6 +26,6 @@ export type ManagerResponse<D extends IResponse | null> = {
   data: D;
 };
 
-export type ProviderResponse<D extends IModel | null> = {
+export type ProviderResponse<D extends IModel | boolean | null> = {
   data: D;
 };

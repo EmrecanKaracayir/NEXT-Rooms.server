@@ -1,4 +1,5 @@
 import { IModel } from "../../../../app/interfaces/IModel";
+import { ModelMismatchError } from "../../../../app/schemas/ServerError";
 
 export class SessionModel implements IModel {
   constructor(
@@ -9,7 +10,27 @@ export class SessionModel implements IModel {
     readonly lastActivityDate: Date,
   ) {}
 
-  public static isValidModel(obj: unknown): obj is SessionModel {
+  public static fromRecord(record: unknown): SessionModel {
+    if (!this.isValidModel(record)) {
+      throw new ModelMismatchError(record);
+    }
+    return new SessionModel(
+      record.sessionId,
+      record.accountId,
+      record.sessionKey,
+      record.refreshToken,
+      record.lastActivityDate,
+    );
+  }
+
+  public static fromRecords(records: unknown[]): SessionModel[] {
+    if (!this.areValidModels(records)) {
+      throw new ModelMismatchError(records);
+    }
+    return records.map((record: unknown): SessionModel => this.fromRecord(record));
+  }
+
+  private static isValidModel(obj: unknown): obj is SessionModel {
     if (typeof obj !== "object" || obj === null) {
       return false;
     }
@@ -23,7 +44,7 @@ export class SessionModel implements IModel {
     );
   }
 
-  public static areValidModels(objs: unknown[]): objs is SessionModel[] {
+  private static areValidModels(objs: unknown[]): objs is SessionModel[] {
     if (!Array.isArray(objs)) {
       return false;
     }

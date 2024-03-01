@@ -1,6 +1,6 @@
 import type { Membership } from "../enums/Membership";
 import type { IModel } from "../interfaces/IModel";
-import { ModelMismatchError } from "../schemas/ServerError";
+import { ModelMismatchError, UnexpectedQueryResultError } from "../schemas/ServerError";
 
 export class AccountModel implements IModel {
   private constructor(
@@ -11,13 +11,16 @@ export class AccountModel implements IModel {
   ) {}
 
   public static fromRecord(record: unknown): AccountModel {
+    if (!record) {
+      throw new UnexpectedQueryResultError();
+    }
     if (!this.isValidModel(record)) {
       throw new ModelMismatchError(record);
     }
     return new AccountModel(record.accountId, record.username, record.password, record.membership);
   }
 
-  public static fromModels(records: unknown[]): AccountModel[] {
+  public static fromRecords(records: unknown[]): AccountModel[] {
     if (!this.areValidModels(records)) {
       throw new ModelMismatchError(records);
     }

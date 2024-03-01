@@ -4,6 +4,8 @@ import { ExpressNextFunction, ExpressRequest } from "../../@types/wrappers";
 import { IController } from "../../app/interfaces/IController";
 import { ClientError, ClientErrorCode } from "../../app/schemas/ClientError";
 import { HttpStatus, HttpStatusCode } from "../../app/schemas/HttpStatus";
+import { ProtoUtil } from "../../app/utils/ProtoUtil";
+import { ResponseUtil } from "../../app/utils/ResponseUtil";
 import { AuthModule } from "../../modules/auth/module";
 import { SignupManager } from "./SignupManager";
 import { SignupRequest } from "./schemas/SignupRequest";
@@ -21,26 +23,49 @@ export class SignupController implements IController {
     res: ControllerResponse<SignupResponse | null, Tokens | null>,
     next: ExpressNextFunction,
   ): Promise<ControllerResponse<SignupResponse | null, Tokens | null> | void> {
-    // Response declaration
-    const clientErrors: Array<ClientError> = [];
-    // Logic
     try {
-      // Validate request body
-      if (!SignupRequest.isValidRequest(req.body)) {
-        const httpStatus: HttpStatus = new HttpStatus(HttpStatusCode.BAD_REQUEST);
-        clientErrors.push(new ClientError(ClientErrorCode.INVALID_REQUEST_BODY));
-        return res.status(httpStatus.code).send({
-          httpStatus: httpStatus,
-          serverError: null,
-          clientErrors: clientErrors,
-          data: null,
-          tokens: null,
-        });
+      const preliminaryData: unknown = req.body;
+      // V1: Existence validation
+      if (ProtoUtil.isProtovalid(preliminaryData)) {
+        return ResponseUtil.controllerResponse(
+          res,
+          new HttpStatus(HttpStatusCode.BAD_REQUEST),
+          null,
+          [new ClientError(ClientErrorCode.MISSING_BODY)],
+          null,
+          null,
+        );
       }
-      // Hand over to manager
+      const protovalidData: unknown = preliminaryData;
+      // V2: Schematic validation
+      if (!SignupRequest.isBlueprint(protovalidData)) {
+        return ResponseUtil.controllerResponse(
+          res,
+          new HttpStatus(HttpStatusCode.BAD_REQUEST),
+          null,
+          [new ClientError(ClientErrorCode.INVALID_BODY)],
+          null,
+          null,
+        );
+      }
+      const blueprintData: SignupRequest = protovalidData;
+      // V3: Physical validation
+      const validationErrors: ClientError[] = SignupRequest.getValidationErrors(blueprintData);
+      if (validationErrors.length > 0) {
+        return ResponseUtil.controllerResponse(
+          res,
+          new HttpStatus(HttpStatusCode.BAD_REQUEST),
+          null,
+          validationErrors,
+          null,
+          null,
+        );
+      }
+      const validatedData: SignupRequest = blueprintData;
+      // HAND OVER TO MANAGER
       const managerResponse: ManagerResponse<SignupResponse | null> =
-        await this.mManager.postSignup(req.body, clientErrors);
-      // Check if there were any errors
+        await this.mManager.postSignup(validatedData);
+      // Check manager response
       if (!managerResponse.httpStatus.isSuccess() || !managerResponse.data) {
         // Respond without token
         return res.status(managerResponse.httpStatus.code).send({

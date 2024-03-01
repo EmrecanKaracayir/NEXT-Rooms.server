@@ -2,22 +2,23 @@ import { QueryResult } from "pg";
 import { TokenPayload } from "../../../@types/tokens";
 import { DbConstants } from "../../../app/constants/DbConstants";
 import { AccountModel } from "../../../app/models/AccountModel";
-import { ModelMismatchError } from "../../../app/schemas/ServerError";
+import type { HandlerResponse } from "../@types/responses";
+import type { IHandler } from "../app/interfaces/IHandler";
+import { AuthResponseUtil } from "../app/utils/AuthResponseUtil";
 
-export class AccountHandler {
-  public static async verifyAccount(tokenPayload: TokenPayload): Promise<boolean> {
+export class AccountHandler implements IHandler {
+  public static async verifyAccount(tokenPayload: TokenPayload): Promise<HandlerResponse<boolean>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
-      const accountRes: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$ACID, [
+      const results: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$ACID, [
         tokenPayload.accountId,
       ]);
-      const accountRec: unknown = accountRes.rows[0];
-      if (!accountRec) {
-        return false;
+      const record: unknown = results.rows[0];
+      if (!record) {
+        return await AuthResponseUtil.handlerResponse(false);
       }
-      const model: AccountModel = AccountModel.fromRecord(accountRec);
-      await DbConstants.POOL.query(DbConstants.COMMIT);
-      return ;
+      const model: AccountModel = AccountModel.fromRecord(record);
+      return model ? true : false;
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;

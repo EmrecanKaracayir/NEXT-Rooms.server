@@ -4,7 +4,7 @@ import { ClientError, ClientErrorCode } from "../schemas/ClientError";
 import { StringUtil } from "../utils/StringUtil";
 
 export class SessionKeyValidator implements IValidator {
-  public static validate(data: string, clientErrors: ClientError[]): void {
+  public static validate(data: string, validationErrors: ClientError[]): void {
     if (
       !StringUtil.isInLengthRange(
         data,
@@ -12,10 +12,10 @@ export class SessionKeyValidator implements IValidator {
         SessionRules.SESSION_KEY_MAX_LENGTH,
       )
     ) {
-      clientErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY_LENGTH));
+      validationErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY_LENGTH));
     }
     if (!StringUtil.matchesRegex(data, SessionRules.SESSION_KEY_REGEX)) {
-      clientErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY_CONTENT));
+      validationErrors.push(new ClientError(ClientErrorCode.INVALID_SESSION_KEY_CONTENT));
     }
   }
 }

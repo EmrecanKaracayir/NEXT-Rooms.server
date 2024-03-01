@@ -2,30 +2,22 @@ import { QueryResult } from "pg";
 import { ProviderResponse } from "../../@types/responses";
 import { DbConstants } from "../../app/constants/DbConstants";
 import { IProvider } from "../../app/interfaces/IProvider";
-import { ModelMismatchError, UnexpectedQueryResultError } from "../../app/schemas/ServerError";
-import { SignupModel } from "./models/SignupModel";
+import { AccountModel } from "../../app/models/AccountModel";
+import { UnexpectedQueryResultError } from "../../app/schemas/ServerError";
+import { ResponseUtil } from "../../app/utils/ResponseUtil";
 
 export class SignupProvider implements IProvider {
   public async doesAccountExist(username: string): Promise<ProviderResponse<boolean>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
-      const accountRes: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$UNAME, [
+      const results: QueryResult = await DbConstants.POOL.query(Queries.GET_ACCOUNT$UNAME, [
         username,
       ]);
-      const accountRec: unknown = accountRes.rows[0];
-      if (!accountRec) {
-        await DbConstants.POOL.query(DbConstants.COMMIT);
-        return {
-          data: false,
-        };
+      const record: unknown = results.rows[0];
+      if (!record) {
+        return await ResponseUtil.providerResponse(false);
       }
-      if (!SignupModel.isValidModel(accountRec)) {
-        throw new ModelMismatchError(accountRec);
-      }
-      await DbConstants.POOL.query(DbConstants.COMMIT);
-      return {
-        data: true,
-      };
+      return await ResponseUtil.providerResponse(AccountModel.fromRecord(record) ? true : false);
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;
@@ -35,24 +27,18 @@ export class SignupProvider implements IProvider {
   public async createAccount(
     username: string,
     password: string,
-  ): Promise<ProviderResponse<SignupModel>> {
+  ): Promise<ProviderResponse<AccountModel>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
-      const accountRes: QueryResult = await DbConstants.POOL.query(
+      const results: QueryResult = await DbConstants.POOL.query(
         Queries.CREATE_ACCOUNT$UNAME_$PSWRD,
         [username, password],
       );
-      const accountRec: unknown = accountRes.rows[0];
-      if (!accountRec) {
+      const record: unknown = results.rows[0];
+      if (!record) {
         throw new UnexpectedQueryResultError();
       }
-      if (!SignupModel.isValidModel(accountRec)) {
-        throw new ModelMismatchError(accountRec);
-      }
-      await DbConstants.POOL.query(DbConstants.COMMIT);
-      return {
-        data: accountRec as SignupModel,
-      };
+      return await ResponseUtil.providerResponse(AccountModel.fromRecord(record));
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;

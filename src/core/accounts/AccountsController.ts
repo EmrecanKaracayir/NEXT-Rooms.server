@@ -5,7 +5,6 @@ import { ClientError, ClientErrorCode } from "../../app/schemas/ClientError";
 import { HttpStatus, HttpStatusCode } from "../../app/schemas/HttpStatus";
 import { ProtoUtil } from "../../app/utils/ProtoUtil";
 import { ResponseUtil } from "../../app/utils/ResponseUtil";
-import { UsernameValidator } from "../../app/validators/UsernameValidator";
 import { AccountsManager } from "./AccountsManager";
 import { AccountsRequest } from "./schemas/AccountsRequest";
 import { AccountsResponse } from "./schemas/AccountsResponse";
@@ -49,7 +48,7 @@ export class AccountsController implements IController {
       }
       const blueprintData: AccountsRequest = protovalidData;
       // V3: Physical validation
-      const validationErrors: ClientError[] = this.physicalValidation(blueprintData);
+      const validationErrors: ClientError[] = AccountsRequest.getValidationErrors(blueprintData);
       if (validationErrors.length > 0) {
         return ResponseUtil.controllerResponse(
           res,
@@ -64,7 +63,7 @@ export class AccountsController implements IController {
       // HAND OVER TO MANAGER
       const managerResponse: ManagerResponse<AccountsResponse | null> =
         await this.mManager.getAccount(validatedData);
-      // Check response
+      // Check manager response
       if (!managerResponse.httpStatus.isSuccess() || !managerResponse.data) {
         // Unsuccessful response
         return ResponseUtil.controllerResponse(
@@ -88,11 +87,5 @@ export class AccountsController implements IController {
     } catch (error) {
       return next(error);
     }
-  }
-
-  private physicalValidation(data: AccountsRequest): ClientError[] {
-    const clientErrors: ClientError[] = new Array<ClientError>();
-    UsernameValidator.validate(data.username, clientErrors);
-    return clientErrors;
   }
 }

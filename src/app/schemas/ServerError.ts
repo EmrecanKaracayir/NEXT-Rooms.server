@@ -30,9 +30,7 @@ export class ModelMismatchError extends Error {
 
 export class UnexpectedMethodError extends Error {
   constructor(public readonly method: string) {
-    super(
-      `Method "${method}" is not expected. Contact with the developers.`,
-    );
+    super(`Method "${method}" is not expected. Contact with the developers.`);
     this.name = "UnexpectedMethodError";
   }
 }

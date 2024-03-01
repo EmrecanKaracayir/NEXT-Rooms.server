@@ -1,7 +1,8 @@
 import { RawTokenData, Tokens } from "../../../@types/tokens";
+import type { IGenerator } from "../app/interfaces/IGenerator";
 import { SessionHandler } from "./SessionHandler";
 
-export class TokenGenerator {
+export class TokenGenerator implements IGenerator {
   private readonly mData: RawTokenData;
 
   public constructor(data: RawTokenData) {

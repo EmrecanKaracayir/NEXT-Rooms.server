@@ -59,7 +59,7 @@ export class ResponseUtil implements IUtil {
     };
   }
 
-  public static async providerResponse<D extends IModel | null>(
+  public static async providerResponse<D extends IModel | boolean | null>(
     data: D,
   ): Promise<ProviderResponse<D>> {
     await DbConstants.POOL.query(DbConstants.COMMIT);

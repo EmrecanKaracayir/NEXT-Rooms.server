@@ -4,7 +4,7 @@ import { ClientError, ClientErrorCode } from "../schemas/ClientError";
 import { StringUtil } from "../utils/StringUtil";
 
 export class UsernameValidator implements IValidator {
-  public static validate(data: string, clientErrors: ClientError[]): void {
+  public static validate(data: string, validationErrors: ClientError[]): void {
     if (
       !StringUtil.isInLengthRange(
         data,
@@ -12,10 +12,10 @@ export class UsernameValidator implements IValidator {
         AccountRules.USERNAME_MAX_LENGTH,
       )
     ) {
-      clientErrors.push(new ClientError(ClientErrorCode.INVALID_USERNAME_LENGTH));
+      validationErrors.push(new ClientError(ClientErrorCode.INVALID_USERNAME_LENGTH));
     }
     if (!StringUtil.matchesRegex(data, AccountRules.USERNAME_REGEX)) {
-      clientErrors.push(new ClientError(ClientErrorCode.INVALID_USERNAME_CONTENT));
+      validationErrors.push(new ClientError(ClientErrorCode.INVALID_USERNAME_CONTENT));
     }
   }
 }

@@ -16,8 +16,7 @@ export class AccountsProvider implements IProvider {
       if (!record) {
         return await ResponseUtil.providerResponse(null);
       }
-      const model: AccountModel = AccountModel.fromRecord(record);
-      return await ResponseUtil.providerResponse(model);
+      return await ResponseUtil.providerResponse(AccountModel.fromRecord(record));
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;

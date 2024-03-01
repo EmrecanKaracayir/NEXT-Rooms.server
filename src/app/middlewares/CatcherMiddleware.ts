@@ -12,11 +12,8 @@ export class CatcherMiddleware implements IMiddleware {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: ExpressNextFunction,
   ): MiddlewareResponse | void {
-    return ResponseUtil.middlewareResponse(
-      res,
-      new HttpStatus(HttpStatusCode.NOT_FOUND),
-      null,
-      [new ClientError(ClientErrorCode.RESOURCE_NOT_FOUND)],
-    );
+    return ResponseUtil.middlewareResponse(res, new HttpStatus(HttpStatusCode.NOT_FOUND), null, [
+      new ClientError(ClientErrorCode.RESOURCE_NOT_FOUND),
+    ]);
   }
 }

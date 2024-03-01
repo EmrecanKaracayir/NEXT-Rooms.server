@@ -1,4 +1,6 @@
 import { IRequest } from "../../../app/interfaces/IRequest";
+import type { ClientError } from "../../../app/schemas/ClientError";
+import { UsernameValidator } from "../../../app/validators/UsernameValidator";
 
 export class AccountsRequest implements IRequest {
   private constructor(public readonly username: string) {}
@@ -9,5 +11,11 @@ export class AccountsRequest implements IRequest {
     }
     const blueprint: AccountsRequest = data as AccountsRequest;
     return typeof blueprint.username === "string";
+  }
+
+  public static getValidationErrors(blueprintData: AccountsRequest): ClientError[] {
+    const validationErrors: ClientError[] = new Array<ClientError>();
+    UsernameValidator.validate(blueprintData.username, validationErrors);
+    return validationErrors;
   }
 }

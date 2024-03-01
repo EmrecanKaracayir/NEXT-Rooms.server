@@ -1,11 +1,11 @@
 import { ManagerResponse, ProviderResponse } from "../../@types/responses";
 import { EncryptionHelper } from "../../app/helpers/EncryptionHelper";
 import { IManager } from "../../app/interfaces/IManager";
+import { AccountModel } from "../../app/models/AccountModel";
 import { ClientError, ClientErrorCode } from "../../app/schemas/ClientError";
 import { HttpStatus, HttpStatusCode } from "../../app/schemas/HttpStatus";
+import { ResponseUtil } from "../../app/utils/ResponseUtil";
 import { LoginProvider } from "./LoginProvider";
-import { LoginAdapter } from "./adapters/LoginAdapter";
-import { LoginModel } from "./models/LoginModel";
 import { LoginRequest } from "./schemas/LoginRequest";
 import { LoginResponse } from "./schemas/LoginResponse";
 
@@ -17,40 +17,38 @@ export class LoginManager implements IManager {
   }
 
   public async postLogin(
-    req: LoginRequest,
-    clientErrors: ClientError[],
+    validatedData: LoginRequest,
   ): Promise<ManagerResponse<LoginResponse | null>> {
     // Try to get account
-    const providerResponse: ProviderResponse<LoginModel | null> = await this.mProvider.getAccount(
-      req.username,
+    const providerResponse: ProviderResponse<AccountModel | null> = await this.mProvider.getAccount(
+      validatedData.username,
     );
-    // Check if there were any errors
+    // Check response
     if (!providerResponse.data) {
-      clientErrors.push(new ClientError(ClientErrorCode.NO_ACCOUNT_FOUND));
-      return {
-        httpStatus: new HttpStatus(HttpStatusCode.UNAUTHORIZED),
-        serverError: null,
-        clientErrors: clientErrors,
-        data: null,
-      };
+      // No account found
+      return ResponseUtil.managerResponse(
+        new HttpStatus(HttpStatusCode.NOT_FOUND),
+        null,
+        [new ClientError(ClientErrorCode.NO_ACCOUNT_FOUND)],
+        null,
+      );
     }
-    // Compare passwords
-    if (!(await EncryptionHelper.compare(req.password, providerResponse.data.password))) {
+    // Account found, check password
+    if (!(await EncryptionHelper.compare(validatedData.password, providerResponse.data.password))) {
       // Passwords don't match
-      clientErrors.push(new ClientError(ClientErrorCode.INCORRECT_PASSWORD));
-      return {
-        httpStatus: new HttpStatus(HttpStatusCode.UNAUTHORIZED),
-        serverError: null,
-        clientErrors: clientErrors,
-        data: null,
-      };
+      return ResponseUtil.managerResponse(
+        new HttpStatus(HttpStatusCode.UNAUTHORIZED),
+        null,
+        [new ClientError(ClientErrorCode.INCORRECT_PASSWORD)],
+        null,
+      );
     }
     // Passwords match
-    return {
-      httpStatus: new HttpStatus(HttpStatusCode.OK),
-      serverError: null,
-      clientErrors: clientErrors,
-      data: LoginAdapter.instance.modelToResponse(providerResponse.data),
-    };
+    return ResponseUtil.managerResponse(
+      new HttpStatus(HttpStatusCode.OK),
+      null,
+      [],
+      AccountModel.fromRecord(providerResponse.data),
+    );
   }
 }

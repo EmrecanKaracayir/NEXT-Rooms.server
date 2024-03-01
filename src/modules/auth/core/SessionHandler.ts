@@ -1,75 +1,73 @@
 import { QueryResult } from "pg";
 import { RawTokenData, Token, TokenPayload, Tokens } from "../../../@types/tokens";
 import { DbConstants } from "../../../app/constants/DbConstants";
-import { ModelMismatchError, UnexpectedQueryResultError } from "../../../app/schemas/ServerError";
+import { UnexpectedQueryResultError } from "../../../app/schemas/ServerError";
+import type { HandlerResponse } from "../@types/responses";
 import { SessionConstants } from "../app/constants/SessionConstants";
+import type { IHandler } from "../app/interfaces/IHandler";
+import { SessionModel } from "../app/models/SessionModel";
+import { AuthResponseUtil } from "../app/utils/AuthResponseUtil";
 import { TokenHandler } from "./TokenHandler";
-import { SessionModel } from "./models/SessionModel";
 
-export class SessionHandler {
+export class SessionHandler implements IHandler {
   public static async verifySession(
     refreshToken: Token,
     tokenPayload: TokenPayload,
-  ): Promise<boolean> {
+  ): Promise<HandlerResponse<boolean>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
-      const sessionRes: QueryResult = await DbConstants.POOL.query(Queries.GET_SESSION$SSID, [
+      const sessionResults: QueryResult = await DbConstants.POOL.query(Queries.GET_SESSION$SSID, [
         tokenPayload.sessionId,
       ]);
-      const sessionRec: unknown = sessionRes.rows[0];
-      if (!sessionRec) {
-        return false;
+      const sessionRecord: unknown = sessionResults.rows[0];
+      if (!sessionRecord) {
+        return await AuthResponseUtil.handlerResponse(false);
       }
-      if (!SessionModel.isValidModel(sessionRec)) {
-        throw new ModelMismatchError(sessionRec);
-      }
-      await DbConstants.POOL.query(DbConstants.COMMIT);
-      if (
-        tokenPayload.accountId !== sessionRec.accountId ||
-        refreshToken !== sessionRec.refreshToken
-      ) {
-        return false;
-      }
-      return true;
+      const session: SessionModel = SessionModel.fromRecord(sessionRecord);
+      return await AuthResponseUtil.handlerResponse(
+        tokenPayload.accountId === session.accountId && refreshToken === session.refreshToken,
+      );
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;
     }
   }
 
-  public static async createOrUpdateSession(tokenData: RawTokenData): Promise<Tokens> {
+  public static async createOrUpdateSession(
+    tokenData: RawTokenData,
+  ): Promise<HandlerResponse<Tokens>> {
     await DbConstants.POOL.query(DbConstants.BEGIN);
     try {
-      const sessionRes: QueryResult = await DbConstants.POOL.query(Queries.GET_SESSIONS$ACID, [
+      const sessionResults: QueryResult = await DbConstants.POOL.query(Queries.GET_SESSIONS$ACID, [
         tokenData.accountId,
       ]);
-      const sessionRec: unknown[] = sessionRes.rows;
-      if (!sessionRec) {
+      const sessionRecords: unknown[] = sessionResults.rows;
+      if (!sessionRecords) {
         throw new UnexpectedQueryResultError();
       }
-      if (sessionRec.length === 0) {
+      if (sessionRecords.length === 0) {
         // Account has no sessions, create one
-        await DbConstants.POOL.query(DbConstants.COMMIT);
-        return await SessionHandler.createSession(tokenData);
+        return await AuthResponseUtil.handlerResponse(
+          await SessionHandler.createSession(tokenData),
+        );
       }
-      if (!SessionModel.areValidModels(sessionRec)) {
-        throw new ModelMismatchError(sessionRec);
-      }
+      const sessions: SessionModel[] = SessionModel.fromRecords(sessionRecords);
       // Account has sessions, find one with matching session key
-      const session: SessionModel | undefined = sessionRec.find(
+      const session: SessionModel | undefined = sessions.find(
         (session: SessionModel): boolean => session.sessionKey === tokenData.sessionKey,
       );
       if (session) {
         // Session found, update it
         await DbConstants.POOL.query(DbConstants.COMMIT);
-        return await SessionHandler.updateSession(tokenData, session);
+        return await AuthResponseUtil.handlerResponse(
+          await SessionHandler.updateSession(tokenData, session),
+        );
       } else {
         // Session not found, create one
         const tokens: Tokens = await SessionHandler.createSession(tokenData);
         // If account has more than max sessions, delete the oldest one
-        await SessionHandler.eliminateSessionIfNecessary(sessionRec);
-        await DbConstants.POOL.query(DbConstants.COMMIT);
-        return tokens;
+        await SessionHandler.eliminateSessionIfNecessary(sessions);
+        return await AuthResponseUtil.handlerResponse(tokens);
       }
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
@@ -78,28 +76,26 @@ export class SessionHandler {
   }
 
   private static async createSession(tokenData: RawTokenData): Promise<Tokens> {
-    const sessionRes: QueryResult = await DbConstants.POOL.query(
+    const sessionResults: QueryResult = await DbConstants.POOL.query(
       Queries.INSERT_SESSION$ACID_$SKEY,
       [tokenData.accountId, tokenData.sessionKey],
     );
-    const sessionRec: unknown = sessionRes.rows[0];
-    if (!sessionRec) {
+    const sessionRecord: unknown = sessionResults.rows[0];
+    if (!sessionRecord) {
       throw new UnexpectedQueryResultError();
     }
-    if (!SessionModel.isValidModel(sessionRec)) {
-      throw new ModelMismatchError(sessionRec);
-    }
+    const session: SessionModel = SessionModel.fromRecord(sessionRecord);
     // Create payload
     const payload: TokenPayload = {
       accountId: tokenData.accountId,
       membership: tokenData.membership,
-      sessionId: sessionRec.sessionId,
+      sessionId: session.sessionId,
     };
     // Generate tokens
     const tokens: Tokens = TokenHandler.generateTokens(payload);
     // Update session
     await DbConstants.POOL.query(Queries.UPDATE_SESSION$SSID_$RTOKEN_$DATE, [
-      sessionRec.sessionId,
+      session.sessionId,
       tokens.refreshToken,
       new Date().toISOString(),
     ]);
