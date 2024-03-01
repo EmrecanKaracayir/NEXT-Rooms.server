@@ -18,7 +18,7 @@ export class AccountHandler implements IHandler {
         return await AuthResponseUtil.handlerResponse(false);
       }
       const model: AccountModel = AccountModel.fromRecord(record);
-      return model ? true : false;
+      return await AuthResponseUtil.handlerResponse(model ? true : false);
     } catch (error) {
       await DbConstants.POOL.query(DbConstants.ROLLBACK);
       throw error;

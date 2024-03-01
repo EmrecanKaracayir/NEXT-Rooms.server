@@ -10,6 +10,6 @@ export class TokenGenerator implements IGenerator {
   }
 
   public async generateTokens(): Promise<Tokens> {
-    return await SessionHandler.createOrUpdateSession(this.mData);
+    return (await SessionHandler.createOrUpdateSession(this.mData)).data;
   }
 }

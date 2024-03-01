@@ -8,14 +8,14 @@ export class PasswordValidator implements IValidator {
     if (
       !StringUtil.isInLengthRange(
         data,
-        AccountRules.USERNAME_MIN_LENGTH,
-        AccountRules.USERNAME_MAX_LENGTH,
+        AccountRules.PASSWORD_MIN_LENGTH,
+        AccountRules.PASSWORD_MAX_LENGTH,
       )
     ) {
-      validationErrors.push(new ClientError(ClientErrorCode.INVALID_USERNAME_LENGTH));
+      validationErrors.push(new ClientError(ClientErrorCode.INVALID_PASSWORD_LENGTH));
     }
-    if (!StringUtil.matchesRegex(data, AccountRules.USERNAME_REGEX)) {
-      validationErrors.push(new ClientError(ClientErrorCode.INVALID_USERNAME_CONTENT));
+    if (!StringUtil.matchesRegex(data, AccountRules.PASSWORD_REGEX)) {
+      validationErrors.push(new ClientError(ClientErrorCode.INVALID_PASSWORD_CONTENT));
     }
   }
 }

@@ -24,7 +24,7 @@ export class AccountsManager implements IManager {
     );
     // Check response
     if (!providerResponse.data) {
-      // Return with error(s)
+      // Return with error
       return ResponseUtil.managerResponse(
         new HttpStatus(HttpStatusCode.NOT_FOUND),
         null,
@@ -32,7 +32,7 @@ export class AccountsManager implements IManager {
         null,
       );
     }
-    // Return the account
+    // Return with success
     return ResponseUtil.managerResponse(
       new HttpStatus(HttpStatusCode.OK),
       null,
